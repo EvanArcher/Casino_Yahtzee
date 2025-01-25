@@ -7,8 +7,8 @@ Created on Sat Jan 25 10:07:19 2025
 """
 #%% Libraries
 import numpy as np
-import pandas as df
-
+import pandas as pd
+from collections import Counter
 #%% Constant values
 num_dice = 5  # Number of dice
 num_sides = 6  # Number of sides on a six-sided die
@@ -27,7 +27,7 @@ def dynamic_fill(df, column, value):
     else:
         # If no blank spots, append a new row with NaN for all other columns
         new_row = {col: (value if col == column else np.nan) for col in df.columns}
-        df = df.append(new_row, ignore_index=True)
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     
     return df
 
@@ -74,3 +74,51 @@ def reroll(dice_roll, dice_to_keep):
         else:
             new_roll.append(np.random.randint(1, num_sides + 1))  # Re-roll this 
     return new_roll
+
+def has_nums_in_order(numbers, nums_in_a_row):
+    """
+    Check if at least 3 numbers in the set are in consecutive ascending order.
+
+    Args:
+        numbers (set or list): A set or list of numbers.
+        nums_in_a_row (int): Value saying how many numbers you need in a row
+
+    Returns:
+        bool: True if at least 3 numbers are in order, False otherwise.
+    """
+    sorted_numbers = sorted(set(numbers))  # Sort the numbers
+    count = 1  # Count consecutive numbers
+
+    # Iterate through the sorted numbers to check for consecutive order
+    for i in range(1, len(sorted_numbers)):
+        if sorted_numbers[i] == sorted_numbers[i - 1] + 1:  # Check if consecutive
+            count += 1
+            if count == nums_in_a_row:  # Found at least x in order
+                return True
+        else:
+            count = 1  # Reset the count if not consecutive
+
+    return False  # No x consecutive numbers found
+
+
+
+def find_number_pairs(numbers):
+    """
+    Find all number pairs (or more) in the list and return them as a list.
+
+    Args:
+        numbers (list): List of numbers.
+
+    Returns:
+        list: List containing all repeated numbers as pairs or more.
+    """
+    # Count occurrences of each number
+    counts = Counter(numbers)
+    
+    # Build a list of repeated numbers
+    pairs = []
+    for num, count in counts.items():
+        if count > 1:  # If the number appears more than once
+            pairs.extend([num] * (count // 2 * 2))  # Add the pairs (even count only)
+    
+    return pairs
