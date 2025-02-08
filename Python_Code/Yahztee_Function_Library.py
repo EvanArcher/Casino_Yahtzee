@@ -104,21 +104,74 @@ def has_nums_in_order(numbers, nums_in_a_row):
 
 def find_number_pairs(numbers):
     """
-    Find all number pairs (or more) in the list and return them as a list.
+    Find all pairs (two identical numbers) from the list and return them.
 
     Args:
         numbers (list): List of numbers.
 
     Returns:
-        list: List containing all repeated numbers as pairs or more.
+        list: List of all pairs of numbers.
     """
-    # Count occurrences of each number
     counts = Counter(numbers)
     
-    # Build a list of repeated numbers
+    # Build the list of pairs
     pairs = []
     for num, count in counts.items():
-        if count > 1:  # If the number appears more than once
-            pairs.extend([num] * (count // 2 * 2))  # Add the pairs (even count only)
+        if count >= 2:
+            pairs.extend([num] * count)
     
     return pairs
+
+def hand_type(hand):
+    """
+    Parameters
+    ----------
+    hand : (list) list of numbers in the hand
+
+    Returns
+    -------
+    hand type as a string
+    "Single",
+    "Pair",
+    "Two Pair",
+    "Three of a Kind",
+    "Full House",
+    "Four of a Kind",
+    "Yahtzee",
+    "Small Straight",
+    "Large Straight",
+    """
+    # Look at hands from biggest to smallest
+    pairs = find_number_pairs(hand)
+    hand_list = []
+    if len(pairs) == 5 and len(set(pairs)) == 1:
+        hand_list.append('Yahtzee')
+        return hand_list
+    if len(pairs) == 5 and len(set(pairs)) == 2:
+        hand_list.append('Full House')
+        return hand_list
+    if len(pairs) == 4:
+        hand_list.append('Four of a Kind')
+        return hand_list
+    if len(pairs) == 3:
+        hand_list.append('Three of a Kind')
+        return hand_list
+    if len(pairs) == 2:
+        hand_list.append('Two Pair')
+    if len(pairs) == 1:
+        hand_list.append('Single')
+    if has_nums_in_order(hand,5):
+        hand_list.append('Large Straight')
+        return hand_list
+    if has_nums_in_order(hand, 4):
+        hand_list.append('Small Straight')
+    return hand_list
+        
+    
+    
+    
+    
+    
+    
+    
+    

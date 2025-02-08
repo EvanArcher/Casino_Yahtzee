@@ -15,7 +15,7 @@ import pandas as pd
 import Yahztee_Function_Library as yfl
 
 #%% Setup variables and winning hands
-num_simulations = 5000 #number of games played to completion
+num_simulations = 500 #number of games played to completion
 num_dice = 5  # Number of dice
 num_sides = 6  # Number of sides on a six-sided die
 # straight sets
@@ -73,7 +73,7 @@ for i in range(0,num_simulations):
             df = yfl.dynamic_fill(df,'large_straight', roll_count)
             continue
     
-    # check if we pursue a straight length is 4 then we decide to go for 3,4,5...of a kind or straight
+    # check if we pursue a straight since we have 3 in a row
     if yfl.has_nums_in_order(dice_roll, 3):
         sm_check = any(set(dice_roll) == sm_set for sm_set in small_straight_sets)
         lg_check = any(set(dice_roll) == lg_set for lg_set in large_straight_sets)
@@ -113,8 +113,11 @@ for i in range(0,num_simulations):
                 # finally have large straight
                 df = yfl.dynamic_fill(df,'large_straight', roll_count)
             continue
-        
-
+    
+    #Now do set logic/chance to pursue a straight some percent of the time
+    if len(yfl.find_number_pairs(dice_roll)) >=2:
+        print(dice_roll)
+        print(yfl.find_number_pairs(dice_roll))
 
 
 
