@@ -150,15 +150,18 @@ def hand_type(hand):
     if len(pairs) == 5 and len(set(pairs)) == 2:
         hand_list.append('Full House')
         return hand_list
-    if len(pairs) == 4:
+    if len(pairs) == 4 and len(set(pairs)) == 1:
         hand_list.append('Four of a Kind')
+        return hand_list
+    if len(pairs) == 4 and len(set(pairs)) == 2:
+        hand_list.append('Two Pair')
         return hand_list
     if len(pairs) == 3:
         hand_list.append('Three of a Kind')
         return hand_list
     if len(pairs) == 2:
-        hand_list.append('Two Pair')
-    if len(pairs) == 1:
+        hand_list.append('Pair')
+    if len(pairs) == 0:
         hand_list.append('Single')
     if has_nums_in_order(hand,5):
         hand_list.append('Large Straight')

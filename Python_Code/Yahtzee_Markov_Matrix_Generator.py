@@ -42,15 +42,29 @@ states = [
     "Large Straight",
 ]
 
-# Create an empty matrix (all zeros initially)
-markov_matrix = np.zeros((len(states), len(states)))
-s_matrix = np.zeros((1, len(states))) #matrix of initial rolls to get distribution
-# Create a DataFrame with the same names for both indices and columns
-s_df = pd.DataFrame(s_matrix, columns=states)
-markov_df = pd.DataFrame(markov_matrix, index=states, columns=states)
+def find_s_matrix(num_sims):
+    """
+    Parameters
+    -------
+    num_sims: number of simulations to find s_matrix
+    Returns
+    -------
+    s_matrix: our initial probability matrix
+    """
+    # Create an empty matrix (all zeros initially)
+    markov_matrix = np.zeros((len(states), len(states)))
+    s_matrix = np.zeros((1, len(states))) #matrix of initial rolls to get distribution
+    # Create a DataFrame with the same names for both indices and columns
+    s_df = pd.DataFrame(s_matrix, columns=states)
+    markov_df = pd.DataFrame(markov_matrix, index=states, columns=states)
 
-# Display the matrix
-print(markov_df)
-
-def find_s_matrix():
-    print(num_dice)
+    # Display the matrix
+    print(markov_df)
+    
+    for i in range(0,num_sims):
+        dice_roll = list((np.random.randint(1, num_sides + 1, num_dice)))
+        rolled_hands = yfl.hand_type(dice_roll)
+        for hand in rolled_hands:
+            markov_df.loc[hand,hand] += 1
+    print(markov_df)
+    return markov_df
