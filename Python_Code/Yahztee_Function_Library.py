@@ -131,6 +131,7 @@ def hand_type(hand):
     Returns
     -------
     hand type as a string
+    "True Single"
     "Single",
     "Pair",
     "Two Pair",
@@ -168,7 +169,20 @@ def hand_type(hand):
         return hand_list
     if has_nums_in_order(hand, 4):
         hand_list.append('Small Straight')
+    if not any('Small Straight' in roll or 'Pair' in roll for roll in hand_list):
+        hand_list.append('True Single')
     return hand_list
+
+def dice_to_keep(hand):
+    """
+    Parameters
+    ----------
+    hand : (list) list of numbers in the hand
+
+    Returns
+    -------
+    dice_keep: (list) which dice to keep as a list
+    """
         
     
     

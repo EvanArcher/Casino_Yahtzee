@@ -25,12 +25,14 @@ import numpy as np
 import pandas as pd
 import Yahztee_Function_Library as yfl
 
+
 #%% Constants
 num_dice = 5  # Number of dice
 num_sides = 6  # Number of sides on a six-sided die
 
 #%% Define the states
 states = [
+    "True Single",
     "Single",
     "Pair",
     "Two Pair",
@@ -66,5 +68,26 @@ def find_s_matrix(num_sims):
         rolled_hands = yfl.hand_type(dice_roll)
         for hand in rolled_hands:
             markov_df.loc[hand,hand] += 1
-    print(markov_df)
-    return markov_df
+    print(markov_df/num_sims)
+    return markov_df/num_sims
+
+def save_matrix(df,save_name):
+    """
+    Parameters
+    -------
+    df: dataframe to be saved
+    save_name: path or name of df you would like to save
+    -------
+    Returns
+    -------
+    None
+    """
+    if save_name.endswith('.csv'):
+        save_name = save_name
+    else:
+        save_name = save_name + '.csv'
+        
+    df.to_csv(save_name, index =True)
+    
+def find_trans_matrix()
+    
