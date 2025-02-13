@@ -12,7 +12,10 @@ from collections import Counter
 #%% Constant values
 num_dice = 5  # Number of dice
 num_sides = 6  # Number of sides on a six-sided die
-
+large_straight_sets = [
+    {1, 2, 3, 4, 5},
+    {2, 3, 4, 5, 6}
+    ]
 
 #%%functions
 # Function to fill the first blank spot in a column, or append a new row if no blank spots
@@ -131,7 +134,6 @@ def hand_type(hand):
     Returns
     -------
     hand type as a string
-    "True Single"
     "Single",
     "Pair",
     "Two Pair",
@@ -160,17 +162,16 @@ def hand_type(hand):
     if len(pairs) == 3:
         hand_list.append('Three of a Kind')
         return hand_list
-    if len(pairs) == 2:
-        hand_list.append('Pair')
-    if len(pairs) == 0:
-        hand_list.append('Single')
     if has_nums_in_order(hand,5):
         hand_list.append('Large Straight')
         return hand_list
     if has_nums_in_order(hand, 4):
         hand_list.append('Small Straight')
+        return hand_list
+    if len(pairs) == 2:
+        hand_list.append('Pair')
     if not any('Small Straight' in roll or 'Pair' in roll for roll in hand_list):
-        hand_list.append('True Single')
+        hand_list.append('Single')
     return hand_list
 
 def dice_to_keep(hand):
@@ -182,12 +183,42 @@ def dice_to_keep(hand):
     Returns
     -------
     dice_keep: (list) which dice to keep as a list
+    
+    Rules
+    -------
+    Function follows 2 simple rules: if pair, keep largest set of pairs...ie full house keep the 3 dice
     """
-        
+    hand_names = hand_type(hand)
+    # we have large straight, we are done!
+    if any('Large Straight' in roll for roll in hand_names):
+        return hand 
+    if any('Small Straight' in roll for roll in hand_names):
+        tar_set, dice_to_keep = find_closest_set(set(hand), large_straight_sets)
+        return dice_to_keep
+    if any('Yahtzee' in roll for roll in hand_names):
+        return hand 
+    #Now we know we must have pairs or a single, need to check if single then return 3 or 4 
+    # This gives highest probability to make a straight, while keeping all pair probabiblities the same
+    if any('Single' in roll for roll in hand_names):
+        if 3 in hand:
+            return [3]
+        else:
+            return [4]
+    pairs_found = find_number_pairs(hand)
+    #Need to find largest collection of dice, if two pair or pair just pick one, preferabbly a 3 or 4 set then re roll
+    if any('Two Pair' in roll or 'Pair' in roll for roll in hand_names):
+        if 4 in pairs_found:
+            return [4,4]
+        if 3 in pairs_found:
+            return [3,3]
+        else:
+            return pairs_found
+    # anyone else return biggest set of pairs
+    counts = Counter(hand)
+
+    most_common_num, count = counts.most_common(1)[0]    
     
-    
-    
-    
+    return [most_common_num] * count
     
     
     

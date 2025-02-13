@@ -32,7 +32,6 @@ num_sides = 6  # Number of sides on a six-sided die
 
 #%% Define the states
 states = [
-    "True Single",
     "Single",
     "Pair",
     "Two Pair",
@@ -89,5 +88,14 @@ def save_matrix(df,save_name):
         
     df.to_csv(save_name, index =True)
     
-def find_trans_matrix()
+def find_trans_matrix():
+    """
+    Parameters
+    -------
+    num_sims: How many times we want to sim 
+    -------
+    Returns
+    -------
+    trans_matrix: (dataframe) matrix highlighting transistion probabilities
+    """
     
