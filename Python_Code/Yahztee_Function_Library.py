@@ -12,6 +12,11 @@ from collections import Counter
 #%% Constant values
 num_dice = 5  # Number of dice
 num_sides = 6  # Number of sides on a six-sided die
+small_straight_sets = [
+    {1, 2, 3, 4},
+    {2, 3, 4, 5},
+    {3, 4, 5, 6}
+]
 large_straight_sets = [
     {1, 2, 3, 4, 5},
     {2, 3, 4, 5, 6}
@@ -48,11 +53,17 @@ def find_closest_set(target_set, list_of_sets):
         tuple: The set with the most matches, the number of matches, and the matching numbers.
     """
     # Find the set with the largest intersection
-    closest_set = max(list_of_sets, key=lambda s: len(target_set & s))
-    matching_numbers = list(target_set & closest_set)
-    match_count = len(matching_numbers)
-
-    return closest_set, matching_numbers
+    if target_set.issuperset({1,2,3,4}):
+        closest_set = {1,2,3,4,5}
+        matching_numbers = target_set & {1,2,3,4,5}
+    elif target_set.issuperset({2,3,4,5}):
+        closest_set = {1,2,3,4,5}
+        matching_numbers = target_set & {1,2,3,4,5}
+    elif target_set.issuperset({3,4,5,6}):
+        closest_set = {2,3,4,5,6}
+        matching_numbers = target_set & {2,3,4,5,6}
+    
+    return closest_set, list(matching_numbers)
 
 def reroll(dice_roll, dice_to_keep):
     """
@@ -146,33 +157,24 @@ def hand_type(hand):
     """
     # Look at hands from biggest to smallest
     pairs = find_number_pairs(hand)
-    hand_list = []
     if len(pairs) == 5 and len(set(pairs)) == 1:
-        hand_list.append('Yahtzee')
-        return hand_list
+        return 'Yahtzee'
     if len(pairs) == 5 and len(set(pairs)) == 2:
-        hand_list.append('Full House')
-        return hand_list
+        return 'Full House'
     if len(pairs) == 4 and len(set(pairs)) == 1:
-        hand_list.append('Four of a Kind')
-        return hand_list
+        return 'Four of a Kind'
     if len(pairs) == 4 and len(set(pairs)) == 2:
-        hand_list.append('Two Pair')
-        return hand_list
+        return 'Two Pair'
     if len(pairs) == 3:
-        hand_list.append('Three of a Kind')
-        return hand_list
+        return 'Three of a Kind'
     if has_nums_in_order(hand,5):
-        hand_list.append('Large Straight')
-        return hand_list
+        return 'Large Straight'
     if has_nums_in_order(hand, 4):
-        hand_list.append('Small Straight')
-        return hand_list
+        return 'Small Straight'
     if len(pairs) == 2:
-        hand_list.append('Pair')
-    if not any('Small Straight' in roll or 'Pair' in roll for roll in hand_list):
-        hand_list.append('Single')
-    return hand_list
+        return 'Pair'
+    else:
+        return 'Single'
 
 def dice_to_keep(hand):
     """
@@ -188,25 +190,25 @@ def dice_to_keep(hand):
     -------
     Function follows 2 simple rules: if pair, keep largest set of pairs...ie full house keep the 3 dice
     """
-    hand_names = hand_type(hand)
+    hand_name = hand_type(hand)
     # we have large straight, we are done!
-    if any('Large Straight' in roll for roll in hand_names):
+    if hand_name == 'Large Straight':
         return hand 
-    if any('Small Straight' in roll for roll in hand_names):
+    if hand_name == 'Small Straight':
         tar_set, dice_to_keep = find_closest_set(set(hand), large_straight_sets)
         return dice_to_keep
-    if any('Yahtzee' in roll for roll in hand_names):
+    if hand_name == 'Yahtzee':
         return hand 
     #Now we know we must have pairs or a single, need to check if single then return 3 or 4 
     # This gives highest probability to make a straight, while keeping all pair probabiblities the same
-    if any('Single' in roll for roll in hand_names):
+    if hand_name == 'Single':
         if 3 in hand:
             return [3]
         else:
             return [4]
     pairs_found = find_number_pairs(hand)
     #Need to find largest collection of dice, if two pair or pair just pick one, preferabbly a 3 or 4 set then re roll
-    if any('Two Pair' in roll or 'Pair' in roll for roll in hand_names):
+    if hand_name == 'Two Pair' or hand_name == 'Pair':
         if 4 in pairs_found:
             return [4,4]
         if 3 in pairs_found:

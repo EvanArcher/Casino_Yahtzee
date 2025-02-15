@@ -64,9 +64,8 @@ def find_s_matrix(num_sims):
     
     for i in range(0,num_sims):
         dice_roll = list((np.random.randint(1, num_sides + 1, num_dice)))
-        rolled_hands = yfl.hand_type(dice_roll)
-        for hand in rolled_hands:
-            markov_df.loc[hand,hand] += 1
+        hand = yfl.hand_type(dice_roll)
+        markov_df.loc[hand,hand] += 1
     print(markov_df/num_sims)
     return markov_df/num_sims
 
@@ -88,7 +87,7 @@ def save_matrix(df,save_name):
         
     df.to_csv(save_name, index =True)
     
-def find_trans_matrix():
+def find_trans_matrix(num_sims):
     """
     Parameters
     -------
@@ -98,4 +97,43 @@ def find_trans_matrix():
     -------
     trans_matrix: (dataframe) matrix highlighting transistion probabilities
     """
+    # Create an empty matrix (all zeros initially)
+    markov_matrix = np.zeros((len(states), len(states)))
+    t_matrix = np.zeros((1, len(states))) #matrix of initial rolls to get distribution
+    # Create a DataFrame with the same names for both indices and columns
+    t_df = pd.DataFrame(t_matrix, columns=states)
+    markov_df = pd.DataFrame(markov_matrix, index=states, columns=states)
+
+    # Display the matrix
+    print(markov_df)
+    
+    #set up dictionary of stuff we need to divide by
+    divisors = {
+        "Single":0,
+        "Pair":0,
+        "Two Pair":0,
+        "Three of a Kind":0,
+        "Full House":0,
+        "Four of a Kind":0,
+        "Yahtzee":0,
+        "Small Straight":0,
+        "Large Straight":0
+        }
+    
+    for i in range(0,num_sims):
+        dice_roll = list((np.random.randint(1, num_sides + 1, num_dice)))
+        hand = yfl.hand_type(dice_roll)
+        kept_dice = yfl.dice_to_keep(dice_roll)
+        new_roll = yfl.reroll(dice_roll, kept_dice)
+        new_hand = yfl.hand_type(new_roll)
+        #capture the transisiton
+        markov_df.loc[hand,new_hand] += 1
+        #update our divisors
+        divisors[hand] += 1
+    trans_matrix = markov_df.div(divisors, axis=0)
+    print(trans_matrix)
+    return trans_matrix
+    
+    
+    
     
